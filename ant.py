@@ -13,7 +13,6 @@ import numpy as np
 
 
 directions_vect = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
-directions = {i:directions_vect[i] for i in range(8)}
 
 
 class Ant(object):
@@ -24,40 +23,29 @@ class Ant(object):
         """
 
         self.grid = grid
-        self.x, self.y = random.choice(self.grid.nests)
+        
+        self.pos = random.choice(self.grid.nests)
 
+        self.states = [grid[self.x,self.y].pheros()]
+        self.rewards = []
+        self.action_dists = []
         self.has_food = False
-        self.distance = 500
+        self.distance = 0
 
-        self.weights = np.zeros(8)
-        self.direction = random.randint(0, 7)
 
     def reset(self):
         """ The ant restarts from a random nest
         """
         self.has_food = False
-        self.distance = 500
+        self.distance = 0
 
-        self.weights = np.zeros(8)
-        self.direction = random.randint(0, 7)
-
-        self.x, self.y = random.choice(self.grid.nests)
-
-    def when_has_food(self):
-        """ Returns the pheromone quantity to scatter if the ant carries food
-        """
-        return 1
-
-    def when_no_food(self):
-        """ Returns the pheromone quantity to scatter when ant doesn't has food
-        """
-        return 1
+        self.pos = random.choice(self.grid.nests)
 
     def scatter_phero(self):
         """ Add the pheromone to the current cell
         """
         
-        self.grid[self.x, self.y].phero += 1
+        self.grid[self.pos[0],self.pos[1]].phero += 1
 
 
     def choose_direction(self):
@@ -67,7 +55,7 @@ class Ant(object):
         self.direction = random.randint(0,7)
 
 
-    def work(self): # the brain
+    def act(self): # the brain
         """ The algorithm of the ant movment
         """
         # Scatter pheromone in the current cell
@@ -76,36 +64,19 @@ class Ant(object):
         # If a direction has been chosen
         
         # decrement the ants count in the current cell
-        self.grid[self.x, self.y].count -= 1
         self.choose_direction()
         # destination is the direction in vector form
-        destination = directions[self.direction]
+        destination = directions_vect[self.direction]
 
         # Move to next cell
-        self.x += destination[0]
-        self.y += destination[1]
+        new_pos = (self.pos[0]+destination[0],self.pos[1]+destination[1])
 
-        # Increment ants count in new cell
-        reward = 0
-        try:
-            if self.grid[self.x, self.y].type =="FOOD":
-                reward = 1
-        except:
-            self.x -= destination[0]
-            self.y -= destination[1]
-            reward = -1
-        self.grid[self.x, self.y].count += 1
+        self.pos,reward = self.grid.access(self.pos,new_pos)
+        
+        
         #decrmetn distance runned
-        self.distance -= 1
+        
+        self.distance += 1
         
         return reward
-        # If no direction has been returned : blocked path
         
-
-        # If new cell has food :
-        #       mark ant as has food and intialize distance
-        #       do a 180° turn
-        
-
-        # If the new cell is the nest : reset ant and decrement ants count
-

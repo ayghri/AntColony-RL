@@ -23,4 +23,4 @@ class Colony:
         """ Make all ants works !
         """
         for ant in self.colony:
-            ant.work()
+            ant.act()

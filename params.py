@@ -13,7 +13,7 @@ block_size = 4 # display size : resolution*blockSize
 
 
 global quantity,evaporate,phero_min,phero_max
-evaporate = 0.98
+evaporate = 0.01
 step = 5
 phero_min = 1 # phero minimal
 phero_max = 40 # pheromone maximale

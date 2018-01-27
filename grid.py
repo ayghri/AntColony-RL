@@ -10,6 +10,8 @@ Defining the Grid class that contains all the cells
 import params
 from cell import Cell
 
+directions_vect = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
+
 
 class Grid(object):
     """ Definig the Grid object
@@ -26,16 +28,38 @@ class Grid(object):
         self.step = params.step
 
     def __getitem__(self, pos):
+        
         """
         Returns the cell in pos
         """
         i, j = pos
-        if (i*(i-self.grid_size[0]) > 0) or (j*(j-self.grid_size[1]) > 0):
-            print("coordinates out of bound, grid size :", (i, j), "out of", self.grid_size)
-            raise NameError("Cell not found")
-            return None
-        return self.grid[i][j]
+        if (i*(self.grid_size[0]-i) >= 0) and ( j*(self.grid_size[1]-j) >= 0):
+            return self.grid[i][j]
 
+        raise NameError("Cell (%d,%d) out of bound"%(i,j))
+        return None
+
+    def access(self,pos,new_pos,has_food):
+        
+        try:
+            reward = self.__getitem__([new_pos[0],new_pos[1]]).access(has_food)
+            pos = new_pos
+        except:
+            reward = -1
+            
+        return pos,reward
+        
+
+    def pheros(self,x,y,has_food):
+        state = []
+        for i in range(8):
+            x0 = x + directions_vect[i][0]
+            y0 = y + directions_vect[i][0]
+            if (x0*(self.grid_size[0]-x0) >= 0) and ( y0*(self.grid_size[1]-y0) >= 0):
+                state.append(self.grid[x0][y0].get_phero(has_food))
+            else:
+                state.append(-2)
+        return state
     def load_grid(self, filename):
         """Loads the grid from filename
         the file contains lines in the format : int x, int y,cell_type
