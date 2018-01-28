@@ -43,18 +43,19 @@ class Grid(object):
         
         try:
             reward = self.__getitem__([new_pos[0],new_pos[1]]).access(has_food)
-            pos = new_pos
+            self.__getitem__(pos).count-=1
+            self.__getitem__(new_pos).count+=1
+            return new_pos, reward
         except:
-            reward = -1
-            
-        return pos,reward
+            reward = self.__getitem__([pos[0],pos[1]]).access(has_food)            
+            return pos,reward
         
 
-    def pheros(self,x,y,has_food):
+    def get_state(self,pos,has_food):
         state = []
         for i in range(8):
-            x0 = x + directions_vect[i][0]
-            y0 = y + directions_vect[i][0]
+            x0 = pos[0] + directions_vect[i][0]
+            y0 = pos[1] + directions_vect[i][0]
             if (x0*(self.grid_size[0]-x0) >= 0) and ( y0*(self.grid_size[1]-y0) >= 0):
                 state.append(self.grid[x0][y0].get_phero(has_food))
             else:
@@ -91,7 +92,6 @@ class Grid(object):
             for row in self.grid:
                 for cell in row:
                     cell.update()
-
     def draw(self, display):
         """ Draw all the grid's cells
         """

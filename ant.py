@@ -21,15 +21,14 @@ class Ant(object):
     def __init__(self, grid):
         """ Initializing the ants
         """
-
-        self.grid = grid
         
+        self.grid = grid
         self.pos = random.choice(self.grid.nests)
-
-        self.states = [grid[self.x,self.y].pheros()]
+        self.has_food = False
+        self.states = [self.get_state()]
         self.rewards = []
         self.action_dists = []
-        self.has_food = False
+        
         self.distance = 0
 
 
@@ -54,7 +53,8 @@ class Ant(object):
         """
         self.direction = random.randint(0,7)
 
-
+    def get_state(self):
+        return self.grid.get_state(self.pos,self.has_food)
     def act(self): # the brain
         """ The algorithm of the ant movment
         """
@@ -71,7 +71,7 @@ class Ant(object):
         # Move to next cell
         new_pos = (self.pos[0]+destination[0],self.pos[1]+destination[1])
 
-        self.pos,reward = self.grid.access(self.pos,new_pos)
+        self.pos,reward = self.grid.access(self.pos,new_pos,self.has_food)
         
         
         #decrmetn distance runned

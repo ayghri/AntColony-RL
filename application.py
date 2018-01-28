@@ -10,19 +10,23 @@ import sys
 import numpy as np
 import pygame
 import params
+import time
 
 
 class Application(object):
     """ Defining the PyGame interface that displays the grid,ants and pheromones traces
 """
-    def __init__(self):
+    def __init__(self,grid):
 
         self.block_size = params.block_size
         self.grid_size = params.grid_size
         self.disp_size = list(np.array(self.grid_size)*self.block_size)
-        self.display = None
+        self.display = pygame.display.set_mode(self.disp_size)
+        self.grid = grid
+        pygame.init()
+        pygame.display.set_caption('Ant Colony')
 
-    def begin_draw(self, grid):
+    def begin_draw(self):
         """ Displays the empty grid to add/remove walls if needeed
             You can also edit walls when the ants are working
             """
@@ -69,32 +73,16 @@ class Application(object):
                 grid[pos].draw(self.display, self.block_size)
             pygame.display.update()
 
-    def start_app(self, grid, colony):
+    def draw_app(self):
         """ Start the colony algorithm and displays the changes on the grid
         """
-        pygame.init()
-        pygame.display.set_caption('Ant Colony')
-        while True:
-            # Start iterations
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+        
+        # Start iterations
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
-                if pygame.mouse.get_pressed() == (1, 0, 0):
-                    pos = list((np.array(pygame.mouse.get_pos())/self.block_size).astype(int))
-                    print("Add wall at", pos)
-                    grid[pos].type = "WALL"
-                    grid[pos].draw(self.display, self.block_size)
-                elif pygame.mouse.get_pressed() == (0, 0, 1):
-                    pos = list((np.array(pygame.mouse.get_pos())/self.block_size).astype(int))
-                    print("remove wall from", pos)
-                    grid[pos].type = "ROAD"
-                    grid[pos].draw(self.display, self.block_size)
-            self.display = pygame.display.set_mode(self.disp_size)
-            self.display.fill([255, 255, 255])
-            # The core
-            colony.work()
-            grid.update()
-            grid.draw(self.display)
-            pygame.display.update()
+        self.display.fill([255, 255, 255])
+        self.grid.draw(self.display)
+        pygame.display.update()

@@ -59,12 +59,19 @@ class Cell(object):
             self.phero = self.phero_max
         elif self.type == "ROAD":
             self.intensity = min((1-self.evaporate)*self.phero,self.phero_max)
-    
+    def get_phero(self,has_food):
+        if self.type =="ROAD":
+            return self.phero
+        else:
+                return 2*(1-0.5*has_food)*(1.0*(self.type=="NEST") - 1.0*(self.type=="FOOD")) -2.0*(self.type=="WALL")
+            
     
     def access(self,has_food):
         reward = 0
         if self.type in ["NEST","FOOD"]:
             reward = 2*(1-0.5*has_food)*(1.0*(self.type=="NEST") - 1.0*(self.type=="FOOD"))        
+        elif self.type =="WALL":
+            raise "WAll cell"
         return reward
     
     def draw(self, display, block_size):
